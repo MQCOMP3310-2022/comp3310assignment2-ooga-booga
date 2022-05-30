@@ -160,6 +160,8 @@ public class SQLiteConnectionManager {
      */
     public boolean isValidWord(String guess)
     {
+        //String cleaning
+
         String sql = "SELECT count(id) as total FROM validWords WHERE word like'"+guess+"';";
         
         try (   Connection conn = DriverManager.getConnection(databaseURL);
@@ -191,4 +193,26 @@ public class SQLiteConnectionManager {
             }
 
     }
-}
+
+//     /**
+//      * 
+//      * @return returns the number of words in the list
+//      */
+//     public static int numberOfWords(){
+//         int result;
+//         String sql = "SELECT count(*) as total FROM validWords;";
+//         try (Connection conn = DriverManager.getConnection(databaseURL);
+//                     PreparedStatement stmt = conn.prepareStatement(sql)
+//         )
+//         {
+//         ResultSet resultRows  = stmt.executeQuery();
+//         while (resultRows.next())
+//         {
+//             result = resultRows.getInt("total");
+//             //System.out.println("Total found:" + result);
+//         }  
+//         return result;
+    
+// }
+// }
+}   
