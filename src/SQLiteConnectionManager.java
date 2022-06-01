@@ -114,6 +114,15 @@ public class SQLiteConnectionManager {
      * @param word the word to store
      */
     public void addValidWord(int id, String word){
+        if(word != null){
+            //string cleaning
+            word=word.replaceAll("[^a-z]","");
+            int wordLength = word.length();
+            if(wordLength>4){
+                //substring the word, could not be a valid word, but best we can do for now
+                word.substring(0, 5);
+            }
+        }        
 
         String sql = "INSERT INTO validWords(id,word) VALUES(?,?)";
 

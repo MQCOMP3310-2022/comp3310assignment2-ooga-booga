@@ -14,7 +14,6 @@ public class Board {
     Grid grid;
     SQLiteConnectionManager wordleDatabaseConnection;
     int numberOfWords;
-    //int max = SQLiteConnectionManager.numberOfWords();
     int min = 0;
     double secretWordIndex;
     int wordIndex;
