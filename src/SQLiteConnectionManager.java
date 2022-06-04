@@ -143,7 +143,7 @@ public class SQLiteConnectionManager {
      */
     public String getWordAtIndex(){
         //gets a random word w/o tainted variable possibility from an outside call to this function
-        //only tainting possible is within this function
+        //only tainting that could possible is within this function
         String checkCount = "SELECT COUNT(*) FROM validWords;";
         Integer randomWord = 0;
         try (Connection conn = DriverManager.getConnection(databaseURL);
@@ -155,6 +155,7 @@ public class SQLiteConnectionManager {
             System.out.println(e.getMessage());
         }
 
+        //finds that random word
         String sql = "SELECT word FROM validWords where id="+randomWord+";";
         String result = "";
         try (Connection conn = DriverManager.getConnection(databaseURL);
@@ -175,13 +176,28 @@ public class SQLiteConnectionManager {
     }
 
     /**
-     * Possible weakness here?
      * @param guess the string to check if it is a valid word.
      * @return true if guess exists in the database, false otherwise
      */
     public boolean isValidWord(String guess)
     {
-        //String cleaning
+        //check to see if string is null or not 4 letters
+        if 
+        (
+            guess == null ||
+            guess.length() != 4
+        ) 
+        { return false; }
+
+        //change string to ensure values are all lower case
+        guess.toLowerCase();        
+
+        //check to see if characters entered are all letters
+        for (int i = 0; i < 4; i++) {
+            if ((Character.isLetter(guess.charAt(i)) == false)) {
+                return false;
+            }
+        }
 
         String sql = "SELECT count(id) as total FROM validWords WHERE word like'"+guess+"';";
         
