@@ -42,9 +42,22 @@ public class Board {
                 String line;
                 int i = 1;
                 while ((line = br.readLine()) != null) {
-                   //System.out.println(line);
-                   wordleDatabaseConnection.addValidWord(i,line);
-                   i++;
+                    if (line.length() != 4) { 
+                        continue; 
+                    }
+
+                    //change string to ensure values are all lower case
+                    line.toLowerCase();        
+
+                    //check to see if characters entered are all letters
+                    for (int j = 0; j < 4; j++) {
+                        if ((Character.isLetter(line.charAt(j)) == false)) {
+                            continue;
+                        }
+                    }
+                    //System.out.println(line);
+                    wordleDatabaseConnection.addValidWord(i,line);
+                    i++;
                 }
                 numberOfWords = i;
                 setupStage = 2;
@@ -59,7 +72,7 @@ public class Board {
         }
 
         grid = new Grid(6,4, wordleDatabaseConnection);
-        String theWord = wordleDatabaseConnection.getWordAtIndex();
+        String theWord = wordleDatabaseConnection.getRandomWord();
         grid.setWord(theWord);
     }
 
@@ -83,7 +96,7 @@ public class Board {
                 break;
             case KeyEvent.VK_ESCAPE:
                 grid.keyPressedEscape();
-                String theWord = wordleDatabaseConnection.getWordAtIndex();
+                String theWord = wordleDatabaseConnection.getRandomWord();
                 grid.setWord(theWord);
         }
 

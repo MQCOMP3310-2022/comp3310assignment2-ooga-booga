@@ -136,20 +136,18 @@ public class SQLiteConnectionManager {
         }
 
     }
-    
+
     /**
      * get the entry in the validWords database
      * @param index the id of the word entry to get
      * @return
      */
-    public String getWordAtIndex(){
+    public String getWordAtIndex(int index){
         //gets a random word w/o tainted variable possibility from an outside call to this function
         //only tainting that could possible is within this function
 
-        Integer randomWord = (int) Math.floor(Math.random()*(numberOfWords()+1));
-
-        //finds that random word
-        String sql = "SELECT word FROM validWords where id="+randomWord+";";
+        //finds a word based on the index
+        String sql = "SELECT word FROM validWords where id="+index+";";
         String result = "";
         try (Connection conn = DriverManager.getConnection(databaseURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -169,12 +167,20 @@ public class SQLiteConnectionManager {
         return result;
     }
 
+    public String getRandomWord() {
+        return getWordAtIndex((int) Math.floor(Math.random()*(numberOfWords()+1)));
+    }
+
     /**
      * @param guess the string to check if it is a valid word.
      * @return true if guess exists in the database, false otherwise
      */
     public boolean isValidWord(String guess)
     {
+        //since SQL language doesnt support any form of 'SELECT' (or other relevant SQL injection paramters)
+        //parameters after a 'LIKE' clause, there is no need to ensure that the 'guess' string has any
+        //malicious instances.
+
         //check to see if string is null or not 4 letters
         if 
         (
