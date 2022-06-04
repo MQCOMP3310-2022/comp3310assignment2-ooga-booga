@@ -141,12 +141,24 @@ public class SQLiteConnectionManager {
      * @param index the id of the word entry to get
      * @return
      */
-    public String getWordAtIndex(int index){
-        String sql = "SELECT word FROM validWords where id="+index+";";
+    public String getWordAtIndex(){
+        //gets a random word w/o tainted variable possibility from an outside call to this function
+        //only tainting possible is within this function
+        String checkCount = "SELECT COUNT(*) FROM validWords;";
+        Integer randomWord = 0;
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+        PreparedStatement checkCountSTMT = conn.prepareStatement(checkCount)) {
+            ResultSet validWordsCountQuery = checkCountSTMT.executeQuery();
+            Integer validWordsCount = validWordsCountQuery.getInt(1);
+            randomWord = (int) Math.floor(Math.random()*(validWordsCount+1));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String sql = "SELECT word FROM validWords where id="+randomWord+";";
         String result = "";
         try (Connection conn = DriverManager.getConnection(databaseURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            //pstmt.setInt(1, index);
             ResultSet cursor = pstmt.executeQuery();
             if(cursor.next()){
                 System.out.println("successful next curser sqlite");
