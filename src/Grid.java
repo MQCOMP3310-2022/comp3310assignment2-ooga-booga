@@ -88,32 +88,41 @@ public class Grid implements Iterable<Cell>{
             if( activeColumn == cells[activeRow].length -1 && 
                 !cells[activeRow][activeColumn].getStoredCharacter().equals(" ")){
                 
-                if(checkActiveRowAgainstWord()){
-                    //success!
+                if (!checkValidWord()) {    //word is not valid
+                    System.out.println(getWord()+" is not a valid word!");
                     for(int i = 0; i < cells[activeRow].length; i++){
                         cells[activeRow][i].setInactive();
-                        cells[activeRow][i].setState(3);
+                        cells[activeRow][i].setState(0);
                     }
-                    gameFinished = true;
+                    activeColumn = 0;
+                    cells[activeRow][activeColumn].setActive();
                 }else{
-                    if(activeRow >= cells.length-1){
-                        // run out of guesses to use
+                    if(checkActiveRowAgainstWord()){
+                        //success!
                         for(int i = 0; i < cells[activeRow].length; i++){
                             cells[activeRow][i].setInactive();
-                            cells[activeRow][i].setState(4);
+                            cells[activeRow][i].setState(3);
                         }
                         gameFinished = true;
                     }else{
-                        //do stuff to highlihgt correct characters
-                        applyHighlightingToCurrentRow();
-                        //move to next row
-                        cells[activeRow][activeColumn].setInactive();
-                        activeRow++;
-                        activeColumn = 0;
-                        cells[activeRow][activeColumn].setActive();
+                        if(activeRow >= cells.length-1){
+                            // run out of guesses to use
+                            for(int i = 0; i < cells[activeRow].length; i++){
+                                cells[activeRow][i].setInactive();
+                                cells[activeRow][i].setState(4);
+                            }
+                            gameFinished = true;
+                        }else{
+                            //do stuff to highlihgt correct characters
+                            applyHighlightingToCurrentRow();
+                            //move to next row
+                            cells[activeRow][activeColumn].setInactive();
+                            activeRow++;
+                            activeColumn = 0;
+                            cells[activeRow][activeColumn].setActive();
+                        }
                     }
                 }
-
             }
         }
     }
@@ -133,11 +142,21 @@ public class Grid implements Iterable<Cell>{
     }
 
     protected boolean checkActiveRowAgainstWord(){
+        
+        return getWord().equals(wordToGuess);
+    }
+
+    protected boolean checkValidWord() {
+        return wordleDatabaseConnection.isValidWord(getWord());
+    }
+
+    protected String getWord() {
         String word ="";
         for(int i = 0; i < cells[activeRow].length; i++){
             word = word + cells[activeRow][i].getStoredCharacter();
         }
-        return word.equals(wordToGuess);
+
+        return word;
     }
 
     protected void applyHighlightingToCurrentRow(){
