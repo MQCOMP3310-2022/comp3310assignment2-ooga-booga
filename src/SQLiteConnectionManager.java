@@ -136,6 +136,7 @@ public class SQLiteConnectionManager {
         }
 
     }
+    
     /**
      * get the entry in the validWords database
      * @param index the id of the word entry to get
@@ -144,16 +145,8 @@ public class SQLiteConnectionManager {
     public String getWordAtIndex(){
         //gets a random word w/o tainted variable possibility from an outside call to this function
         //only tainting that could possible is within this function
-        String checkCount = "SELECT COUNT(*) FROM validWords;";
-        Integer randomWord = 0;
-        try (Connection conn = DriverManager.getConnection(databaseURL);
-        PreparedStatement checkCountSTMT = conn.prepareStatement(checkCount)) {
-            ResultSet validWordsCountQuery = checkCountSTMT.executeQuery();
-            Integer validWordsCount = validWordsCountQuery.getInt(1);
-            randomWord = (int) Math.floor(Math.random()*(validWordsCount+1));
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+
+        Integer randomWord = (int) Math.floor(Math.random()*(numberOfWords()+1));
 
         //finds that random word
         String sql = "SELECT word FROM validWords where id="+randomWord+";";
@@ -164,6 +157,7 @@ public class SQLiteConnectionManager {
             if(cursor.next()){
                 System.out.println("successful next curser sqlite");
                 result = cursor.getString(1);
+                result.toLowerCase();
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -231,25 +225,24 @@ public class SQLiteConnectionManager {
 
     }
 
-//     /**
-//      * 
-//      * @return returns the number of words in the list
-//      */
-//     public static int numberOfWords(){
-//         int result;
-//         String sql = "SELECT count(*) as total FROM validWords;";
-//         try (Connection conn = DriverManager.getConnection(databaseURL);
-//                     PreparedStatement stmt = conn.prepareStatement(sql)
-//         )
-//         {
-//         ResultSet resultRows  = stmt.executeQuery();
-//         while (resultRows.next())
-//         {
-//             result = resultRows.getInt("total");
-//             //System.out.println("Total found:" + result);
-//         }  
-//         return result;
+     /**
+      * 
+      * @return returns the number of words in the list
+      */
+     private int numberOfWords() {
+        int result = 0;
+        String sql = "SELECT count(*) as total FROM validWords;";
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+                    PreparedStatement stmt = conn.prepareStatement(sql)) {
+        ResultSet resultRows  = stmt.executeQuery();
+        while (resultRows.next()) {
+            result = resultRows.getInt("total");
+        }   
     
-// }
-// }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return result;
+    }
 }   
