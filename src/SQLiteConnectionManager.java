@@ -65,7 +65,7 @@ public class SQLiteConnectionManager {
      * @return true if the file exists in the correct location, false otherwise. If no url defined, also false.
      */
     public boolean checkIfConnectionDefined(){
-        if(databaseURL == ""){
+        if(databaseURL.equals("")){
             return false;
         }else{
             try (Connection conn = DriverManager.getConnection(databaseURL)) {
@@ -86,7 +86,7 @@ public class SQLiteConnectionManager {
      * @return true if the table structures have been created.
      */
     public boolean createWordleTables(){
-        if(databaseURL != ""){
+        if(!databaseURL.equals("")){
             try (   Connection conn = DriverManager.getConnection(databaseURL);
                     Statement stmt = conn.createStatement()
                 ) 
@@ -152,12 +152,11 @@ public class SQLiteConnectionManager {
                 System.out.println("successful next curser sqlite");
                 result = cursor.getString(1);
             }
+            cursor.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println("getWordAtIndex===========================");
-        System.out.println("sql: " + sql);
-        System.out.println("result: " + result);
+        
 
         return result;
     }
