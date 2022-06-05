@@ -136,39 +136,69 @@ public class SQLiteConnectionManager {
         }
 
     }
+
     /**
      * get the entry in the validWords database
      * @param index the id of the word entry to get
      * @return
      */
     public String getWordAtIndex(int index){
+        //gets a random word w/o tainted variable possibility from an outside call to this function
+        //only tainting that could possible is within this function
+
+        //finds a word based on the index
         String sql = "SELECT word FROM validWords where id="+index+";";
         String result = "";
         try (Connection conn = DriverManager.getConnection(databaseURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            //pstmt.setInt(1, index);
             ResultSet cursor = pstmt.executeQuery();
             if(cursor.next()){
                 System.out.println("successful next curser sqlite");
                 result = cursor.getString(1);
+                result.toLowerCase();
             }
             cursor.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        
+        System.out.println("getWordAtIndex===========================");
+        //System.out.println("sql: " + sql);
+        //System.out.println("result: " + result);
 
         return result;
     }
 
+    public String getRandomWord() {
+        return getWordAtIndex((int) Math.floor(Math.random()*(numberOfWords()+1)));
+    }
+
     /**
-     * Possible weakness here?
      * @param guess the string to check if it is a valid word.
      * @return true if guess exists in the database, false otherwise
      */
     public boolean isValidWord(String guess)
     {
-        //String cleaning
+        //since SQL language doesnt support any form of 'SELECT' (or other relevant SQL injection paramters)
+        //parameters after a 'LIKE' clause, there is no need to ensure that the 'guess' string has any
+        //malicious instances.
+
+        //check to see if string is null or not 4 letters
+        if 
+        (
+            guess == null ||
+            guess.length() != 4
+        ) 
+        { return false; }
+
+        //change string to ensure values are all lower case
+        guess.toLowerCase();        
+
+        //check to see if characters entered are all letters
+        for (int i = 0; i < 4; i++) {
+            if ((Character.isLetter(guess.charAt(i)) == false)) {
+                return false;
+            }
+        }
 
         String sql = "SELECT count(id) as total FROM validWords WHERE word like'"+guess+"';";
         
@@ -202,25 +232,24 @@ public class SQLiteConnectionManager {
 
     }
 
-//     /**
-//      * 
-//      * @return returns the number of words in the list
-//      */
-//     public static int numberOfWords(){
-//         int result;
-//         String sql = "SELECT count(*) as total FROM validWords;";
-//         try (Connection conn = DriverManager.getConnection(databaseURL);
-//                     PreparedStatement stmt = conn.prepareStatement(sql)
-//         )
-//         {
-//         ResultSet resultRows  = stmt.executeQuery();
-//         while (resultRows.next())
-//         {
-//             result = resultRows.getInt("total");
-//             //System.out.println("Total found:" + result);
-//         }  
-//         return result;
+     /**
+      * 
+      * @return returns the number of words in the list
+      */
+     private int numberOfWords() {
+        int result = 0;
+        String sql = "SELECT count(*) as total FROM validWords;";
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+                    PreparedStatement stmt = conn.prepareStatement(sql)) {
+        ResultSet resultRows  = stmt.executeQuery();
+        while (resultRows.next()) {
+            result = resultRows.getInt("total");
+        }   
     
-// }
-// }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return result;
+    }
 }   
