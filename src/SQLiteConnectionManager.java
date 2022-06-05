@@ -161,8 +161,8 @@ public class SQLiteConnectionManager {
             System.out.println(e.getMessage());
         }
         System.out.println("getWordAtIndex===========================");
-        System.out.println("sql: " + sql);
-        System.out.println("result: " + result);
+        //System.out.println("sql: " + sql);
+        //System.out.println("result: " + result);
 
         return result;
     }
