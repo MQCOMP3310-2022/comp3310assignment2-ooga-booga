@@ -17,6 +17,7 @@ public class Board {
     int min = 0;
     double secretWordIndex;
     int wordIndex;
+    private int keyCode;
 
     public Board(){
         wordleDatabaseConnection = new SQLiteConnectionManager("words.db");
@@ -41,9 +42,22 @@ public class Board {
                 String line;
                 int i = 1;
                 while ((line = br.readLine()) != null) {
-                   //System.out.println(line);
-                   wordleDatabaseConnection.addValidWord(i,line);
-                   i++;
+                    if (line.length() != 4) { 
+                        continue; 
+                    }
+
+                    //change string to ensure values are all lower case
+                    line.toLowerCase();        
+
+                    //check to see if characters entered are all letters
+                    for (int j = 0; j < 4; j++) {
+                        if ((Character.isLetter(line.charAt(j)) == false)) {
+                            continue;
+                        }
+                    }
+                    //System.out.println(line);
+                    wordleDatabaseConnection.addValidWord(i,line);
+                    i++;
                 }
                 numberOfWords = i;
                 setupStage = 2;
@@ -57,12 +71,8 @@ public class Board {
             System.out.println("Not able to Launch. Sorry!");
         }
 
-
-
         grid = new Grid(6,4, wordleDatabaseConnection);
-        secretWordIndex = Math.floor(Math.random()*(numberOfWords-min+1)+min);
-        wordIndex = (int) secretWordIndex;
-        String theWord = wordleDatabaseConnection.getWordAtIndex(wordIndex);
+        String theWord = wordleDatabaseConnection.getRandomWord();
         grid.setWord(theWord);
     }
 
@@ -75,10 +85,38 @@ public class Board {
     }    
 
     public void keyPressed(KeyEvent e){
+
+        keyCode = e.getKeyCode();
+        switch(keyCode) {
+            case KeyEvent.VK_ENTER:
+                grid.keyPressedEnter();
+                break;
+            case KeyEvent.VK_BACK_SPACE:
+                grid.keyPressedBackspace();
+                break;
+            case KeyEvent.VK_ESCAPE:
+                grid.keyPressedEscape();
+                String theWord = wordleDatabaseConnection.getRandomWord();
+                grid.setWord(theWord);
+        }
+
+        if(!e.isShiftDown() && keyCode >= KeyEvent.VK_A && keyCode <= KeyEvent.VK_Z){
+
+            //sanitize e.getKeyChar()
+            char letter = e.getKeyChar();
+            if ((Character.isLetter(letter) == false)) { 
+                System.out.println("Invalid character!");
+            } else {
+                grid.keyPressedLetter(letter);
+            }
+        }
+
+
+        /*
         System.out.println("Key Pressed! " + e.getKeyCode());
 
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
-            grid.keyPressedEnter();
+            
             System.out.println("Enter Key");
         }
         if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
@@ -94,10 +132,12 @@ public class Board {
 
             System.out.println("Escape Key");
         }
-        if(e.getKeyCode()>= KeyEvent.VK_A && e.getKeyCode() <= KeyEvent.VK_Z){
+        if(!e.isShiftDown() && e.getKeyCode() >= KeyEvent.VK_A && e.getKeyCode() <= KeyEvent.VK_Z){
             grid.keyPressedLetter(e.getKeyChar());
             System.out.println("Character Key");
         }
+
+        */
 
     }
 }
